@@ -18,6 +18,13 @@ def preprocess_frame(frame):
     face = np.expand_dims(face, axis=0)  # Add a batch dimension
     return face
 
+# Load custom Haar Cascade for full face detection
+haar_cascade_path = "/Users/benayah/Desktop/Code/OpenCV/face_reco_v4/face_recognition_project/config/haarcascades/haar_full_face.xml"
+face_cascade = cv.CascadeClassifier(haar_cascade_path)
+
+if face_cascade.empty():
+    raise FileNotFoundError(f"Haar cascade file not found at {haar_cascade_path}")
+
 # Initialize the webcam
 cap = cv.VideoCapture(0)
 
@@ -28,8 +35,9 @@ while True:
         print("Failed to capture image")
         break
 
-    # Detect face region (For simplicity, assuming the entire frame is the face)
-    # In a real scenario, you would use a face detection algorithm like Haar Cascade or DNN to extract the face region
+    # Change image to greyscale for the Haar cascade recognition 
+    gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=12)
     
     # Preprocess the frame for the model
     preprocessed_face = preprocess_frame(frame)
@@ -46,6 +54,11 @@ while True:
     text = f"User: {username}, Confidence: {confidence:.2f}"
     cv.putText(frame, text, (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv.LINE_AA)
     
+    # Frame the face of current user 
+    if len(faces) > 0:
+        for (x, y, w, h) in faces:
+            cv.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+
     # Show the frame with the prediction
     cv.imshow('Face Recognition', frame)
     
