@@ -8,3 +8,5 @@ def Register():
         os.makedirs(userFolder, exist_ok=True)  # Create folder 
 
     return user_name, userFolder
+
+Register()

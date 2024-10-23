@@ -10,7 +10,7 @@ mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, refine_landmarks=True)
 
 # Load custom Haar Cascade for full face detection
-haar_cascade_path = "face_recognition_project/config/haarcascades/haar_full_face.xml"
+haar_cascade_path = "/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_recognition_project/config/haarcascades/haar_full_face.xml"
 face_cascade = cv.CascadeClassifier(haar_cascade_path)
 
 if face_cascade.empty():
@@ -73,3 +73,6 @@ def captureFullFace(user_name, user_folder,frame_max = 50):
     finally:
         cap.release()  # Release the camera
         cv.destroyAllWindows()
+
+#testing 
+# captureFullFace()
