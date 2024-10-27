@@ -3,6 +3,7 @@ from recognition.FullFaceRecognition import captureFullFace
 from recognition.EyeRecognition import captureEyes
 from recognition.NoseRecognition import captureNose
 from recognition.MouthRecognition import captureMouth
+from training import train
 
 def face_capture(user_name):
     user_folder = Register(user_name)
@@ -11,6 +12,8 @@ def face_capture(user_name):
     captureEyes(user_name, user_folder)
     captureNose(user_name, user_folder)
     captureMouth(user_name, user_folder)
+
+    train()
 
 if __name__ == '__main__':
     # face_capture(user_name="local_test") locally testing the code 
