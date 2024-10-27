@@ -9,13 +9,12 @@ mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, refine_landmarks=True)
 
 # Load custom Haar Cascade for eye detection (optional if using MediaPipe for eyes)
-haar_cascade_path = "face_recognition_project/config/haarcascades/haar_eye.xml"
+haar_cascade_path = "/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco/face_reco_v4_v2/src/haarcascades/haar_eye.xml"
 face_cascade = cv.CascadeClassifier(haar_cascade_path)
 
 if face_cascade.empty():
     raise FileNotFoundError(f"Haar cascade file not found at {haar_cascade_path}")
 
-cap = cv.VideoCapture(0)
 
 def get_existing_frame_count(userFolder, frame_type):
     """Ensure the frame type folder exists and return the count of saved frames."""
@@ -28,7 +27,7 @@ def crop_region(frame, x1, y1, x2, y2):
     return frame[y1:y2, x1:x2]
 
 def captureEyes(user_name, user_folder, frame_max=50):
-
+    cap = cv.VideoCapture(0, cv.CAP_DSHOW)
     os.makedirs(user_folder, exist_ok=True)  # Checks if the folder for the user exists; if not, creates it
 
     # Get the existing frame count separately for left and right eyes
@@ -114,7 +113,7 @@ def captureEyes(user_name, user_folder, frame_max=50):
 
             cv.putText(frame, f"Left Eye: {left_eye_frame_count}/50", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
             cv.putText(frame, f"Right Eye: {right_eye_frame_count}/50", (10, 60), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-            cv.imshow("Eye Capture", frame)
+            # cv.imshow("Eye Capture", frame)
 
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break

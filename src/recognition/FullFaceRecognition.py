@@ -1,6 +1,7 @@
 import os 
 import cv2 as cv 
 import mediapipe as mp 
+import os 
 
 from utils.saveFrame import save_frame
 
@@ -10,13 +11,13 @@ mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, refine_landmarks=True)
 
 # Load custom Haar Cascade for full face detection
-haar_cascade_path = "face_recognition_project/config/haarcascades/haar_full_face.xml"
+haar_cascade_path = '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco/face_reco_v4_v2/src/haarcascades/haar_full_face.xml'
 face_cascade = cv.CascadeClassifier(haar_cascade_path)
 
 if face_cascade.empty():
     raise FileNotFoundError(f"Haar cascade file not found at {haar_cascade_path}")
 
-cap = cv.VideoCapture(0)
+
 
 def get_existing_frame_count(userFolder, frame_type):
     """Ensure the frame type folder exists and return the count of saved frames."""
@@ -25,15 +26,20 @@ def get_existing_frame_count(userFolder, frame_type):
     return len([f for f in os.listdir(frame_path) if f.endswith(('.jpg', '.png'))])
 
 def captureFullFace(user_name, user_folder,frame_max = 50):
+    cap = cv.VideoCapture(0, cv.CAP_AVFOUNDATION)
 
     os.makedirs(user_folder, exist_ok=True) #checks if the folder for the user exists, if not creates it
 
     current_frame_number = get_existing_frame_count(user_folder, "Full_Face")
 
     try:
+        if not cap.isOpened():
+            print("Error: camera could not open properly")
+            return 
+
         while cap.isOpened() and current_frame_number < frame_max:
             ret, frame = cap.read()
-            if not ret or frame is None:
+            if not ret or frame is None or frame.size == 0:
                 print("Failed to capture frame")
                 break
             
@@ -62,7 +68,7 @@ def captureFullFace(user_name, user_folder,frame_max = 50):
 
             # Display current frame count
             cv.putText(frame, f"{current_frame_number}/50", (10, 30), cv.FONT_HERSHEY_SCRIPT_SIMPLEX, 1, (0, 255, 0), 2)
-            cv.imshow("Full Face Capture", frame)
+            # cv.imshow("Full Face Capture", frame)
 
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break

@@ -19,7 +19,7 @@ def preprocess_frame(frame):
     return face
 
 # Load custom Haar Cascade for full face detection
-haar_cascade_path = "/Users/benayah/Desktop/Code/OpenCV/face_reco_v4/face_recognition_project/config/haarcascades/haar_full_face.xml"
+haar_cascade_path = "face_reco/face_reco_v4_v2/config/haarcascades/haar_full_face.xml"
 face_cascade = cv.CascadeClassifier(haar_cascade_path)
 
 if face_cascade.empty():

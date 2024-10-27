@@ -9,7 +9,7 @@ from keras._tf_keras.keras.utils import to_categorical
 from sklearn.preprocessing import LabelEncoder
 
 # Define the paths
-frames_folder = '/Users/benayah/Desktop/Code/OpenCV/face_reco_v4/face_recognition_project/src/frames'  # Adjust this to your frames folder path
+frames_folder = '/Users/benayah/Desktop/Code/OpenCV/face_reco_v4/face_reco/face_reco_v4_v2/src/frames'  # Adjust this to your frames folder path
 
 # Function to load images from a structured directory
 def load_images_from_directory(directory):

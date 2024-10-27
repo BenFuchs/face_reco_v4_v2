@@ -8,10 +8,10 @@ from utils.saveFrame import save_frame
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, refine_landmarks=True)
 
-cap = cv.VideoCapture(0)
+
 
 # Load custom Haar Cascade for eye detection (optional if using MediaPipe for eyes)
-haar_cascade_path = "face_recognition_project/config/haarcascades/haar_mouth.xml"
+haar_cascade_path = "/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco/face_reco_v4_v2/src/haarcascades/haar_mouth.xml"
 face_cascade = cv.CascadeClassifier(haar_cascade_path)
 
 if face_cascade.empty():
@@ -28,7 +28,7 @@ def crop_region(frame, x1, y1, x2, y2):
     return frame[y1:y2, x1:x2]
 
 def captureMouth(user_name, user_folder, frame_max=50):
-
+    cap = cv.VideoCapture(0, cv.CAP_DSHOW)
     os.makedirs(user_folder, exist_ok=True)  # Checks if the folder for the user exists; if not, creates it
 
     current_frame_count = get_existing_frame_count(user_folder, "MOUTH")
@@ -88,7 +88,7 @@ def captureMouth(user_name, user_folder, frame_max=50):
                     cv.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
             cv.putText(frame, f"Mouth: {current_frame_count}/50", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-            cv.imshow("Mouth Capture", frame)
+            # cv.imshow("Mouth Capture", frame)
 
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break
