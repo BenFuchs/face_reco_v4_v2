@@ -5,11 +5,13 @@ from sklearn.preprocessing import LabelEncoder
 from keras._tf_keras.keras.utils import to_categorical
 
 # Load the trained model
-model = load_model('face_recognition_model.h5')
+model_path = '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src/face_recognition_model.h5'
+model = load_model(model_path)
 
 # Assume the label encoder used during training is saved or recreated
+label_class_path = '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src/classes.npy'
 label_encoder = LabelEncoder()
-label_encoder.classes_ = np.load('classes.npy')  # Load the classes if saved during training
+label_encoder.classes_ = np.load(label_class_path)  # Load the classes if saved during training
 
 # Function to preprocess the frame before making predictions
 def preprocess_frame(frame):
@@ -19,7 +21,7 @@ def preprocess_frame(frame):
     return face
 
 # Load custom Haar Cascade for full face detection
-haar_cascade_path = "face_reco/face_reco_v4_v2/config/haarcascades/haar_full_face.xml"
+haar_cascade_path = "/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src/haarcascades/haar_full_face.xml"
 face_cascade = cv.CascadeClassifier(haar_cascade_path)
 
 if face_cascade.empty():

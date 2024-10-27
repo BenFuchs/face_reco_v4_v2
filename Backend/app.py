@@ -1,3 +1,10 @@
+import sys
+sys.path.insert(0, '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src')
+
+from face_capture import face_capture # type: ignore
+from waga import testRecognize # type: ignore
+
+
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token
@@ -7,11 +14,6 @@ from sqlalchemy import Integer, String, select
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from models import Users, db , tokenBlacklist #Users class 
-import sys
-
-from src.face_capture import face_capture
-from src.waga import testRecognize
-
 
 api = Flask(__name__)
 CORS(api, resources={r"/*": {"origins": "*"}})  # Allow all origins for testing

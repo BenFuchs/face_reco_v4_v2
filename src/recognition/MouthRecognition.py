@@ -11,7 +11,7 @@ face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, refi
 
 
 # Load custom Haar Cascade for eye detection (optional if using MediaPipe for eyes)
-haar_cascade_path = "/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco/face_reco_v4_v2/src/haarcascades/haar_mouth.xml"
+haar_cascade_path = "/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src/haarcascades/haar_mouth.xml"
 face_cascade = cv.CascadeClassifier(haar_cascade_path)
 
 if face_cascade.empty():

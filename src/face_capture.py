@@ -8,12 +8,16 @@ from training import train
 def face_capture(user_name):
     user_folder = Register(user_name)
     # print(user_name, user_folder) debugging
-    captureFullFace(user_name, user_folder)
+    print("Capturing face: ")
+    # captureFullFace(user_name, user_folder)
+    print("Capturing eyes: ")
     captureEyes(user_name, user_folder)
+    print("Capturing nose: ")
     captureNose(user_name, user_folder)
+    print("Capturing mouth: ")
     captureMouth(user_name, user_folder)
 
-    train()
+    # train()
 
 if __name__ == '__main__':
     # face_capture(user_name="local_test") locally testing the code 

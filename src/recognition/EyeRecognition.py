@@ -9,7 +9,7 @@ mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, refine_landmarks=True)
 
 # Load custom Haar Cascade for eye detection (optional if using MediaPipe for eyes)
-haar_cascade_path = "/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco/face_reco_v4_v2/src/haarcascades/haar_eye.xml"
+haar_cascade_path = "/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src/haarcascades/haar_eye.xml"
 face_cascade = cv.CascadeClassifier(haar_cascade_path)
 
 if face_cascade.empty():
@@ -124,3 +124,6 @@ def captureEyes(user_name, user_folder, frame_max=50):
     finally:
         cap.release()
         cv.destroyAllWindows()
+
+# testing 
+captureEyes(user_name="localTEST", user_folder="LOCALTEST", frame_max=50)
