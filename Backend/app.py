@@ -1,8 +1,8 @@
 import sys
 sys.path.insert(0, '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src')
 
-from face_capture import face_capture # type: ignore
-from waga import testRecognize # type: ignore
+from face_capture import face_capture 
+from waga import testRecognize 
 
 
 from flask import Flask, jsonify, request, send_from_directory

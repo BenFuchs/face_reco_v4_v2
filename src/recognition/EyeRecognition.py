@@ -3,7 +3,6 @@ import cv2 as cv
 import mediapipe as mp 
 
 from utils.saveFrame import save_frame
-
 # Initialize MediaPipe Face Mesh
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, refine_landmarks=True)
@@ -15,7 +14,6 @@ face_cascade = cv.CascadeClassifier(haar_cascade_path)
 if face_cascade.empty():
     raise FileNotFoundError(f"Haar cascade file not found at {haar_cascade_path}")
 
-
 def get_existing_frame_count(userFolder, frame_type):
     """Ensure the frame type folder exists and return the count of saved frames."""
     frame_path = os.path.join(userFolder, frame_type)
@@ -26,8 +24,8 @@ def crop_region(frame, x1, y1, x2, y2):
     """Crops the specified region from the frame."""
     return frame[y1:y2, x1:x2]
 
-def captureEyes(user_name, user_folder, frame_max=50):
-    cap = cv.VideoCapture(0, cv.CAP_DSHOW)
+def captureEyes(user_name, user_folder, cap, frame_max=50):
+    # cap = cv.VideoCapture(0, cv.CAP_DSHOW)
     os.makedirs(user_folder, exist_ok=True)  # Checks if the folder for the user exists; if not, creates it
 
     # Get the existing frame count separately for left and right eyes
@@ -62,11 +60,19 @@ def captureEyes(user_name, user_folder, frame_max=50):
                     ]
 
     try:
+        if  not cap.isOpened():
+            print("Error: camera could not open properly")
+            return 
+
         while cap.isOpened() and (left_eye_frame_count < frame_max or right_eye_frame_count < frame_max):
             ret, frame = cap.read()
             if not ret:
                 print("Image was not captured properly, ERROR!")
                 break
+
+            if frame.shape[2] != 3:
+                print("Captured frame does not have 3 channels!")
+                continue
 
             # Convert to grayscale for Haar cascade processing
             gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
@@ -102,28 +108,28 @@ def captureEyes(user_name, user_folder, frame_max=50):
                     if left_eye_crop.size > 0 and left_eye_frame_count < frame_max and len(faces) > 0:
                         save_frame(left_eye_crop, user_name, user_folder, "LEFT_EYE")
                         left_eye_frame_count += 1
+                    else:
+                        print("ERROR LINE 112")
+                        return
 
                     if right_eye_crop.size > 0 and right_eye_frame_count < frame_max and len(faces) > 0:
                         save_frame(right_eye_crop, user_name, user_folder, "RIGHT_EYE")
                         right_eye_frame_count += 1
+                    else:
+                        print("ERROR LINE 119")
+                        return
 
-                    # Draw rectangles around the eyes on the original frame for visualization
-                    cv.rectangle(frame, (left_x1, left_y1), (left_x2, left_y2), (0, 255, 0), 2)
-                    cv.rectangle(frame, (right_x1, right_y1), (right_x2, right_y2), (0, 255, 0), 2)
+            #         # Draw rectangles around the eyes on the original frame for visualization
+            #         cv.rectangle(frame, (left_x1, left_y1), (left_x2, left_y2), (0, 255, 0), 2)
+            #         cv.rectangle(frame, (right_x1, right_y1), (right_x2, right_y2), (0, 255, 0), 2)
 
-            cv.putText(frame, f"Left Eye: {left_eye_frame_count}/50", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-            cv.putText(frame, f"Right Eye: {right_eye_frame_count}/50", (10, 60), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-            # cv.imshow("Eye Capture", frame)
+            # cv.putText(frame, f"Left Eye: {left_eye_frame_count}/50", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+            # cv.putText(frame, f"Right Eye: {right_eye_frame_count}/50", (10, 60), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+            # # cv.imshow("Eye Capture", frame)
 
-            if cv.waitKey(1) & 0xFF == ord('q'):
-                break
+            # if cv.waitKey(1) & 0xFF == ord('q'):
+            #     break
 
     except Exception as e:
         print(f"An error occurred: {e}")
 
-    finally:
-        cap.release()
-        cv.destroyAllWindows()
-
-# testing 
-captureEyes(user_name="localTEST", user_folder="LOCALTEST", frame_max=50)

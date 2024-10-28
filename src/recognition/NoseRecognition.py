@@ -27,8 +27,8 @@ def crop_region(frame, x1, y1, x2, y2):
     """Crops the specified region from the frame."""
     return frame[y1:y2, x1:x2]
 
-def captureNose(user_name, user_folder, frame_max=50):
-    cap = cv.VideoCapture(0, cv.CAP_DSHOW)
+def captureNose(user_name, user_folder, cap, frame_max=50):
+    # cap = cv.VideoCapture(0, cv.CAP_DSHOW)
     os.makedirs(user_folder, exist_ok=True)  # Checks if the folder for the user exists; if not, creates it
 
     current_frame_count = get_existing_frame_count(user_folder, "NOSE")
@@ -94,6 +94,3 @@ def captureNose(user_name, user_folder, frame_max=50):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-    finally:
-        cap.release()
-        cv.destroyAllWindows()

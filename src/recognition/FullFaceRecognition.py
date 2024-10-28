@@ -1,10 +1,8 @@
 import os 
 import cv2 as cv 
 import mediapipe as mp 
-import os 
 
 from utils.saveFrame import save_frame
-
 
 # Initialize MediaPipe Face Mesh
 mp_face_mesh = mp.solutions.face_mesh
@@ -25,8 +23,8 @@ def get_existing_frame_count(userFolder, frame_type):
     os.makedirs(frame_path, exist_ok=True)
     return len([f for f in os.listdir(frame_path) if f.endswith(('.jpg', '.png'))])
 
-def captureFullFace(user_name, user_folder,frame_max = 50):
-    cap = cv.VideoCapture(0, cv.CAP_AVFOUNDATION)
+def captureFullFace(user_name, user_folder, cap, frame_max = 50):
+    # cap = cv.VideoCapture(0)
 
     os.makedirs(user_folder, exist_ok=True) #checks if the folder for the user exists, if not creates it
 
@@ -67,15 +65,12 @@ def captureFullFace(user_name, user_folder,frame_max = 50):
                 current_frame_number += 1
 
             # Display current frame count
-            cv.putText(frame, f"{current_frame_number}/50", (10, 30), cv.FONT_HERSHEY_SCRIPT_SIMPLEX, 1, (0, 255, 0), 2)
+            # cv.putText(frame, f"{current_frame_number}/50", (10, 30), cv.FONT_HERSHEY_SCRIPT_SIMPLEX, 1, (0, 255, 0), 2)
             # cv.imshow("Full Face Capture", frame)
 
-            if cv.waitKey(1) & 0xFF == ord('q'):
-                break
+            # if cv.waitKey(1) & 0xFF == ord('q'):
+            #     break
 
     except Exception as e:
         print(f"An error occurred: {e}")
 
-    finally:
-        cap.release()  # Release the camera
-        cv.destroyAllWindows()
