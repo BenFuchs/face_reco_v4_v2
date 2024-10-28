@@ -1,3 +1,4 @@
+import os 
 import cv2 as cv
 import numpy as np
 from keras._tf_keras.keras.models import load_model
@@ -6,12 +7,22 @@ from keras._tf_keras.keras.utils import to_categorical
 
 # Load the trained model
 model_path = '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src/face_recognition_model.h5'
-model = load_model(model_path)
-
-# Assume the label encoder used during training is saved or recreated
 label_class_path = '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src/classes.npy'
+
+if os.path.exists(model_path):
+    model = load_model(model_path)
+    print(f"Loaded model from: {model_path}")
+else:
+    model = None  # Or create a placeholder model if needed
+    print(f"Model file does not exist: {model_path}. Please register a user to create the model.")
+
 label_encoder = LabelEncoder()
-label_encoder.classes_ = np.load(label_class_path)  # Load the classes if saved during training
+if os.path.exists(label_class_path):
+    label_encoder.classes_ = np.load(label_class_path)
+    print(f"Loaded label classes from: {label_class_path}")
+else:
+    label_encoder.classes_ = None  # Or handle this case as needed
+    print(f"Classes file does not exist: {label_class_path}. Please ensure training has been performed.")
 
 # Function to preprocess the frame before making predictions
 def preprocess_frame(frame):

@@ -25,7 +25,7 @@ def face_capture(user_name):
 
     cap.release()
 
-    # train()
+    train()
 
 if __name__ == '__main__':
     # face_capture(user_name="local_test") #locally testing the code 

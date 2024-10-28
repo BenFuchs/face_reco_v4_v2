@@ -4,15 +4,13 @@ import numpy as np
 from keras._tf_keras.keras.models import Sequential
 from keras._tf_keras.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from keras._tf_keras.keras.preprocessing.image import ImageDataGenerator
-
 from keras._tf_keras.keras.utils import to_categorical
 from sklearn.preprocessing import LabelEncoder
 
 # Define the paths
 frames_folder = '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src/frames'  # Adjust this to your frames folder path
-
-# /Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src/frames
-
+model_path = '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src/face_recognition_model.h5'
+classes_path = '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src/classes.npy'
 
 # Function to load images from a structured directory
 def load_images_from_directory(directory):
@@ -36,6 +34,25 @@ def load_images_from_directory(directory):
     return np.array(images), np.array(labels)
 
 def train():
+     # Check if model and classes files exist and delete them if they do
+    if os.path.exists(model_path):
+        os.remove(model_path)
+        print(f"Deleted old model file: {model_path}")
+    else:
+        # Create an empty model file if needed (optional)
+        with open(model_path, 'w') as f:
+            f.write("")  # Creates an empty file
+        print(f"Created empty model file: {model_path}")
+
+    if os.path.exists(classes_path):
+        os.remove(classes_path)
+        print(f"Deleted old classes file: {classes_path}")
+    else:
+        # Create an empty classes file if needed (optional)
+        with open(classes_path, 'w') as f:
+            f.write("")  # Creates an empty file
+        print(f"Created empty classes file: {classes_path}")
+
     # Load images
     X, y = load_images_from_directory(frames_folder)
 
@@ -79,5 +96,7 @@ def train():
     model.fit(datagen.flow(X, y_one_hot, batch_size=32), epochs=50)
 
     # Save the model
-    model.save('face_recognition_model.h5')
-    np.save('classes.npy', label_encoder.classes_)
+    model.save(model_path)
+    np.save(classes_path, label_encoder.classes_)
+    print(f"Saved new model file: {model_path}")
+    print(f"Saved new classes file: {classes_path}")
