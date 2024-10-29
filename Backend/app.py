@@ -27,6 +27,7 @@ jwt= JWTManager(api)
 
 @api.route('/test')
 def test():
+    print('test')
     return 'test'
 
 @api.route('/registerAdmin', methods=['POST'])
