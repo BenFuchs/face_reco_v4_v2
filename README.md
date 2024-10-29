@@ -7,3 +7,11 @@
 
             FIXED: 
             Error was, each recognition file had a closing of the camera statement at the end. Removed that and passed opening and closing of camera as part of the functions in 'face_capture.py'
+
+
+
+    29/10/24
+    - to do features:
+    [] QOL feature: loading bar in terminal for face capture segments (https://stackoverflow.com/questions/3173320/text-progress-bar-in-terminal-with-block-characters)
+
+    

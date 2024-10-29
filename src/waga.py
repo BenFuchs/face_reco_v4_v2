@@ -1,19 +1,18 @@
-import os 
+import os
 import cv2 as cv
 import numpy as np
 from keras._tf_keras.keras.models import load_model
 from sklearn.preprocessing import LabelEncoder
-from keras._tf_keras.keras.utils import to_categorical
 
 # Load the trained model
 model_path = '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src/face_recognition_model.h5'
 label_class_path = '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src/classes.npy'
 
+model = None
 if os.path.exists(model_path):
     model = load_model(model_path)
     print(f"Loaded model from: {model_path}")
 else:
-    model = None  # Or create a placeholder model if needed
     print(f"Model file does not exist: {model_path}. Please register a user to create the model.")
 
 label_encoder = LabelEncoder()
@@ -21,7 +20,6 @@ if os.path.exists(label_class_path):
     label_encoder.classes_ = np.load(label_class_path)
     print(f"Loaded label classes from: {label_class_path}")
 else:
-    label_encoder.classes_ = None  # Or handle this case as needed
     print(f"Classes file does not exist: {label_class_path}. Please ensure training has been performed.")
 
 # Function to preprocess the frame before making predictions
@@ -39,8 +37,12 @@ if face_cascade.empty():
     raise FileNotFoundError(f"Haar cascade file not found at {haar_cascade_path}")
 
 def testRecognize():
-    # Initialize the webcam
+    if model is None:
+        print("Model not loaded. Please ensure a model is trained and available.")
+        return
+    
     cap = cv.VideoCapture(0)
+    last_recognized_user = None  # Track the last recognized username
 
     while True:
         ret, frame = cap.read()
@@ -49,38 +51,30 @@ def testRecognize():
             print("Failed to capture image")
             break
 
-        # Change image to greyscale for the Haar cascade recognition 
         gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=12)
         
-        # Preprocess the frame for the model
         preprocessed_face = preprocess_frame(frame)
-        
-        # Make a prediction
         predictions = model.predict(preprocessed_face)
-        confidence = np.max(predictions)  # Get the highest confidence score
-        predicted_label = np.argmax(predictions)  # Get the index of the highest score
-        
-        # Decode the label back to the username
+        confidence = np.max(predictions)
+        predicted_label = np.argmax(predictions)
         username = label_encoder.inverse_transform([predicted_label])[0]
-        
-        # Display the username and confidence on the frame
-        text = f"User: {username}, Confidence: {confidence:.2f}"
-        # cv.putText(frame, text, (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv.LINE_AA)
-        print(text)
-        
-        # Frame the face of current user 
+
+        # Check confidence threshold and if user is different from last recognized
+        if confidence > 0.9:
+            if username != last_recognized_user:
+                print(f"Recognized new user: {username} with confidence {confidence:.2f}")
+                last_recognized_user = username
+                yield username  # Yielding only when a new unique username is detected
+            elif last_recognized_user == username:
+                print(f"Recognized same user again: {username}")
+                yield username  # Yield again if the same user is repeatedly detected
+
         if len(faces) > 0:
             for (x, y, w, h) in faces:
                 cv.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
-        # Show the frame with the prediction
-        # cv.imshow('Face Recognition', frame)
-        
-        # # Exit on 'q' key
-        # if cv.waitKey(1) & 0xFF == ord('q'):
-        #     break
+    # cap.release()
+    # cv.destroyAllWindows()
 
-    # Release the webcam and close windows
-    cap.release()
-    cv.destroyAllWindows()
+# testRecognize()

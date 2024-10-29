@@ -1,8 +1,8 @@
 import sys
 sys.path.insert(0, '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src')
 
-from face_capture import face_capture 
-from waga import testRecognize 
+from face_capture import face_capture #vscode issue the import works
+from waga import testRecognize #vscode issue the import works
 
 
 from flask import Flask, jsonify, request, send_from_directory
@@ -13,7 +13,7 @@ from sqlalchemy.orm import DeclarativeBase, joinedload,Mapped, mapped_column
 from sqlalchemy import Integer, String, select
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from models import Users, db , tokenBlacklist #Users class 
+from models import Users, db , userInOrOut 
 
 api = Flask(__name__)
 CORS(api, resources={r"/*": {"origins": "*"}})  # Allow all origins for testing
@@ -32,17 +32,17 @@ def test():
 @api.route('/registerAdmin', methods=['POST'])
 def registerAdmin():
     data = request.get_json()
-    if not data or not data.get('Email') or not data.get('Password'):
+    if not data or not data.get('email') or not data.get('Password'):
         return jsonify({"msg": "Missing email or password"}), 400
 
-    Email = data['Email']
+    email = data['email']
     password= data['Password']
 
-    if Users.query.filter_by(Email=Email).first() is not None:
+    if Users.query.filter_by(email=email).first() is not None:
         return jsonify({"msg": "User already exists"}), 409
 
     pwd_hash = generate_password_hash(password)
-    new_Admin = Users(Email=Email, Password=pwd_hash, Active=True, Role="Admin")
+    new_Admin = Users(email=email, password=pwd_hash, active=True, role="Admin")
     db.session.add(new_Admin)
     db.session.commit()
 
@@ -53,10 +53,10 @@ def registerAdmin():
 def login():
     if request.method == 'POST':
         data = request.get_json()
-        Email = data['Email']
+        email = data['email']
         password = data['Password']
 
-        user = Users.query.filter_by(Email=Email).first() or Users.query.filter_by(Role="Admin", Email=Email).first()
+        user = Users.query.filter_by(email=email).first() or Users.query.filter_by(Role="Admin", email=email).first()
         
         if not user:
             return jsonify({
@@ -71,25 +71,25 @@ def login():
                 'message': 'Wrong password'
             }), 401
 
-        acc_token = create_access_token(identity={'email': Email, 'role': user.Role})
+        acc_token = create_access_token(identity={'email': email, 'role': user.role})
         return jsonify({'acc_token': acc_token}), 200
     return "waga"
 
 @api.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    if not data or not data.get('Email') or not data.get('Password'):
+    if not data or not data.get('email') or not data.get('password'):
         return jsonify({"msg": "Missing email or password"}), 400
 
-    Email = data['Email']
-    password= data['Password']
+    email = data['email']
+    password= data['password']
     username = data['username']
 
-    if Users.query.filter_by(Email=Email).first() is not None:
+    if Users.query.filter_by(email=email).first() is not None:
         return jsonify({"msg": "User already exists"}), 409
 
     pwd_hash = generate_password_hash(password)
-    new_user = Users(Email=Email, Password=pwd_hash, Active=True, Role="client")
+    new_user = Users(email=email, password=pwd_hash, username=username ,active=True, role="client")
     db.session.add(new_user)
     db.session.commit()
 
@@ -100,7 +100,25 @@ def register():
 
 @api.route('/testLogin', methods=['POST'])
 def testLogin():
-    testRecognize()
+    username = next(testRecognize())
+    user = Users.query.filter_by(username=username).first()
+    
+    if user:
+        # Check if there's an existing userInOrOut record
+        user_location = userInOrOut.query.filter_by(user_id=user.id).first()
+        
+        if user_location:
+            # Toggle the flag value
+            user_location.flag = not user_location.flag
+        else:
+            # Create a new userInOrOut entry if it doesn't exist
+            user_location = userInOrOut(user_id=user.id, flag=True)
+            db.session.add(user_location)
+
+        db.session.commit()
+        return {'username': username, 'flag': user_location.flag}
+    else:
+        return {'error': 'User not found'}, 404
 
 if __name__ == '__main__':
     with api.app_context():
