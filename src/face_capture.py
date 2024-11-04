@@ -7,9 +7,9 @@ from training import train
 
 import cv2 as cv 
 
-def face_capture(user_name):
-    user_folder = Register(user_name)
-    # print(user_name, user_folder) debugging
+def face_capture():
+    user_folder, user_name = Register()
+    print(user_name, user_folder) #debugging
 
     cap = cv.VideoCapture(0)
     counter = 0
@@ -28,5 +28,5 @@ def face_capture(user_name):
     train()
 
 if __name__ == '__main__':
-    # face_capture(user_name="local_test") #locally testing the code 
+#     # face_capture(user_name="local_test") #locally testing the code 
     face_capture()

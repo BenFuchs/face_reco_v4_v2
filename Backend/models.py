@@ -1,6 +1,7 @@
+import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, joinedload, Mapped, mapped_column
-from sqlalchemy import Integer, String, Boolean, ForeignKey, select
+from sqlalchemy import DateTime, Integer, String, Boolean, ForeignKey, func, select
 
 class Base(DeclarativeBase):
     pass
@@ -29,8 +30,15 @@ class TokenBlacklist(db.Model):
 class userInOrOut(db.Model):
     __tablename__ = 'user_in_or_out'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    flag = db.Column(db.Boolean, default = False)  # in/out flag switch
+    user_id = db.Column(db.String, db.ForeignKey("users.username"))
+    flag = db.Column(db.Boolean, default=False)  # in/out flag switch
+    time = db.Column(DateTime, default=func.now())  # Log the recognition time by default
     
     # Define the back reference to Users
     user = db.relationship("Users", back_populates="location")
+
+class RecognitionLog(db.Model):
+    __tablename__ = 'recognition_log'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String, db.ForeignKey("users.username"))
+    recognition_time = db.Column(DateTime, default=datetime.now)

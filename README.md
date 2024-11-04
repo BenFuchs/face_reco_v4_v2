@@ -14,4 +14,15 @@
     - to do features:
     [] QOL feature: loading bar in terminal for face capture segments (https://stackoverflow.com/questions/3173320/text-progress-bar-in-terminal-with-block-characters)
 
-    
+    - move register back to terminal use
+    - server should only be receiving "username" and hour that its logged 
+    - if an unregistered username is noticed return unknown and send an image of user to the server 
+
+    -change the whole view. the server just needs to be for receiving data and displaying it in an app. not activiating the scripts.
+
+    3/11/24
+    [V] register back in terminal
+    [V] Change model in the backend to recieve username and hour logging
+    [V] if user does not match database of faces return a new username as unknown and take an image of the user 
+    [ ] add feedback for the AI on the unknown users (loss function and good/bad function) + fixing function (if they get the user wrong tell them who it is)
+    [ ] ORDER THE PI

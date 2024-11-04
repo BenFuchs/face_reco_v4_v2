@@ -1,9 +1,8 @@
 import sys
 sys.path.insert(0, '/Users/benayah/Desktop/Code/Sec_camera_project/face_reco_v4/face_reco_v4_v2/src')
-
+import datetime
 from face_capture import face_capture #vscode issue the import works
 from waga import testRecognize #vscode issue the import works
-
 
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
@@ -13,7 +12,7 @@ from sqlalchemy.orm import DeclarativeBase, joinedload,Mapped, mapped_column
 from sqlalchemy import Integer, String, select
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from models import Users, db , userInOrOut 
+from models import Users, db , userInOrOut , RecognitionLog
 
 api = Flask(__name__)
 CORS(api, resources={r"/*": {"origins": "*"}})  # Allow all origins for testing
@@ -98,28 +97,38 @@ def register():
 
     return jsonify({"msg": "User registered successfully"}), 201
 
-
-@api.route('/testLogin', methods=['POST'])
-def testLogin():
-    username = next(testRecognize())
-    user = Users.query.filter_by(username=username).first()
+@api.route('/recognize_user', methods=['POST'])
+def recognize_user():
+    data = request.get_json()
+    username = data.get('user_id')
     
-    if user:
-        # Check if there's an existing userInOrOut record
-        user_location = userInOrOut.query.filter_by(user_id=user.id).first()
-        
-        if user_location:
-            # Toggle the flag value
-            user_location.flag = not user_location.flag
-        else:
-            # Create a new userInOrOut entry if it doesn't exist
-            user_location = userInOrOut(user_id=user.id, flag=True)
-            db.session.add(user_location)
-
-        db.session.commit()
-        return {'username': username, 'flag': user_location.flag}
+    if not username:
+        return jsonify({"error": "User ID is required"}), 400
+    
+    # Check if the user already has a record in userInOrOut
+    user_entry = db.session.execute(
+        select(userInOrOut).filter_by(user_id=username)
+    ).scalar_one_or_none()
+    
+    current_time = datetime.now()
+    
+    if user_entry is None:
+        # Create a new userInOrOut entry with the latest time
+        new_entry = userInOrOut(user_id=username, flag=True, time=current_time)
+        db.session.add(new_entry)
     else:
-        return {'error': 'User not found'}, 404
+        # Update the time for an existing entry
+        user_entry.time = current_time #log new time entry 
+        user_entry.flag = not user_entry.flag  # toggle flag switch 
+
+    # Log every recognition in the RecognitionLog table
+    new_log_entry = RecognitionLog(user_id=username, recognition_time=current_time)
+    db.session.add(new_log_entry)
+    
+    db.session.commit()  # Commit all changes to the database
+    
+    return jsonify({"message": "User recognized and logged", "user_id": username, "time": current_time}), 201
+
 
 if __name__ == '__main__':
     with api.app_context():
